@@ -85,7 +85,6 @@ Pygments==2.11.2
 Pympler==1.0.1
 PyMySQL==1.0.2
 pyparsing==3.0.8
-pyrsistent==0.18.1
 pywin32==303
 pywinpty==2.0.5
 pyzmq==22.3.0
