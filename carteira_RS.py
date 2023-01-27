@@ -45,6 +45,7 @@ df_movimentacao = pd.DataFrame()
 df_negociacao = pd.DataFrame()
 df_posicao = pd.DataFrame()
 df_tickerType = pd.DataFrame()
+df_subscricoes = pd.DataFrame()
 
 
 uploaded_files = st.sidebar.file_uploader("Escolha os arquivos (*.xlsx)", type=["csv", "xlsx"], accept_multiple_files=True)
@@ -73,6 +74,8 @@ for uploaded_file in uploaded_files:
     if uploaded_file.name.startswith("subscricoes"):
         df = pd.read_excel("subscricoes.xlsx", sheet_name="ticker_type")
         df_tickerType = df_tickerType.append(df,ignore_index=True)
+        df_subs = pd.read_excel("subscricoes.xlsx", sheet_name="subscricoes")
+        df_subscricoes = df_subscricoes.append(df_subs,ignore_index=True)
 
 
 if not all(flag_files):
@@ -149,7 +152,7 @@ df_negociacao.loc[df_negociacao["Código de Negociação"] == "KISU11", 'Valor']
 #### Adicionando subscricoes ####
 #################################
 ### Abrir arquivo de subscricoes. Base de dados criada por mim para manter o historico das subscricoes
-df_subscricoes = pd.read_excel("subscricoes.xlsx", sheet_name="subscricoes")
+#df_subscricoes = pd.read_excel("subscricoes.xlsx", sheet_name="subscricoes")
 df_negociacao = df_negociacao.append(df_subscricoes, ignore_index=True)
 
 #################################
