@@ -83,7 +83,6 @@ pydeck==0.8.0
 pyecharts==2.0.1
 Pygments==2.11.2
 Pympler==1.0.1
-PyMySQL==1.0.2
 pywin32==303
 pywinpty==2.0.5
 pyzmq==22.3.0
