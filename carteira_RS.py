@@ -44,6 +44,8 @@ flag_files = {"Movimentação": False, "Negociação": False, "Posição": False
 df_movimentacao = pd.DataFrame()
 df_negociacao = pd.DataFrame()
 df_posicao = pd.DataFrame()
+df_tickerType = pd.DataFrame()
+
 
 uploaded_files = st.sidebar.file_uploader("Escolha os arquivos (*.xlsx)", type=["csv", "xlsx"], accept_multiple_files=True)
 
@@ -67,6 +69,10 @@ for uploaded_file in uploaded_files:
         df = pd.read_excel(uploaded_file, sheet_name="Fundo de Investimento")
         df_posicao = df_posicao.append(df,ignore_index=True)
         flag_files["Posição"] = True
+
+    if uploaded_file.name.startswith("subscricoes"):
+        df = pd.read_excel("subscricoes.xlsx", sheet_name="ticker_type")
+        df_tickerType = df_tickerType.append(df,ignore_index=True)
 
 
 if not all(flag_files):
@@ -104,7 +110,7 @@ df_negociacao.drop_duplicates(keep='first', inplace=True)
 #df_posicao = pd.read_excel("posicao-2023-01-12.xlsx", sheet_name="Fundo de Investimento")
 df_posicao=df_posicao.dropna() # dropping rows with no values
 # Add ticker type
-df_tickerType = pd.read_excel("subscricoes.xlsx", sheet_name="ticker_type")
+#df_tickerType = pd.read_excel("subscricoes.xlsx", sheet_name="ticker_type")
 df_posicao['ticker_type'] = df_posicao['Código de Negociação'].map(df_tickerType.set_index('Ticker')['Type'])
 df_posicao['percent'] = (df_posicao.Quantidade/df_posicao.Quantidade.sum())*100
 df_posicao['percent'] = df_posicao['percent'].round(decimals=2).astype('str') + ' %'
