@@ -72,9 +72,9 @@ for uploaded_file in uploaded_files:
         flag_files["Posição"] = True
 
     if uploaded_file.name.startswith("subscricoes"):
-        df = pd.read_excel("subscricoes.xlsx", sheet_name="ticker_type")
+        df = pd.read_excel(uploaded_file, sheet_name="ticker_type")
         df_tickerType = df_tickerType.append(df,ignore_index=True)
-        df_subs = pd.read_excel("subscricoes.xlsx", sheet_name="subscricoes")
+        df_subs = pd.read_excel(uploaded_file, sheet_name="subscricoes")
         df_subscricoes = df_subscricoes.append(df_subs,ignore_index=True)
 
 
