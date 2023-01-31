@@ -1,0 +1,25 @@
+credentials:
+  usernames:
+    rsilva:
+      email: rsilva@gmail.com
+      name: Rodrigo Silva
+      password: $2b$12$kVPduYyxoKi.nx9AOweZaeeYbiGM5Cb1zVEtAAm0guJMN5hX/ZSgm # To be replaced with hashed password
+    convidado:
+      email: convidado@gmail.com
+      name: Convidados
+      password: $2b$12$SYfNXd.XEPY2SAVlSynTJO3BqoeK7kQpQAfZJOYuqpDSBvF/rDxFq # To be replaced with hashed password
+    netz:
+      email: netz@netz.com
+      name: Rodrigo Netz
+      password: $2b$12$kVPduYyxoKi.nx9AOweZaeeYbiGM5Cb1zVEtAAm0guJMN5hX/ZSgm
+    brese:
+      email: brese@brese.com
+      name: Rodrigo Breseghelo
+      password: $2b$12$kVPduYyxoKi.nx9AOweZaeeYbiGM5Cb1zVEtAAm0guJMN5hX/ZSgm
+cookie:
+  expiry_days: 1
+  key: random_signature_key
+  name: random_cookie_name
+preauthorized:
+  emails:
+  - melsby@gmail.com
