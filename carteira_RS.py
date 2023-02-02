@@ -8,6 +8,7 @@ from tkinter import filedialog
 import streamlit_authenticator as stauth
 import yaml
 from tickerType import *
+import yfinance as yf
 #import time
 
 #####################################
@@ -175,7 +176,7 @@ class CarteiraB3:
         if all_options_ticker:
             selected_tickers = st.sidebar.multiselect('Selecione os Tickers:', allTickers, default=allTickers)
         else:
-            selected_tickers = st.sidebar.multiselect('Selecione os Tickers:', allTickers, default=["HGLG11", "DEVA11"])
+            selected_tickers = st.sidebar.multiselect('Selecione os Tickers:', allTickers, default=["MXRF11"])
 
         min_Value=pd.to_datetime(self.df_movimentacao.Data.min())
         max_Value=pd.to_datetime(self.df_movimentacao.Data.max())
@@ -193,20 +194,53 @@ class CarteiraB3:
         self.plotting()
 
 #################################
+####    Colorir celulas   ####
+################################# 
+    # def _color_cell(self, val1):
+    #     st.write(val1)
+    #     color = 'red' if val1 < 100 else 'green'
+    #     return 'color: {}'.format(color)
+    def _color_cell(self, x):
+        c1 = 'color: red'
+        c2 = '' 
+        #compare columns
+        mask = x['Preco_medio'] > x['Preco Atual']
+        #DataFrame with same index and columns names as original filled empty strings
+        df1 =  pd.DataFrame(c2, index=x.index, columns=x.columns)
+        #modify values of df1 column by boolean mask
+        df1.loc[mask, 'Preco_medio'] = c1
+        return df1       
+
+#################################
 ####    Tabela preco medio   ####
 ################################# 
     def precosMedio(self):
-        st.write('Preços medios')
+        st.write('Preços medios (R$)')
         df_synthesis = self.df_negociacao.groupby("Código de Negociação").sum()
         df_synthesis.drop(['Preço'], axis=1, inplace=True)
         df_synthesis["Preco_medio"] = df_synthesis["Valor"]/df_synthesis["Quantidade"]
         df_synthesis.rename(columns={"Valor": "Valor Investido", "Quantidade": "Numero de quotas"}, inplace=True)
-        st.dataframe(df_synthesis.style.format(subset=['Valor Investido', 'Preco_medio'], formatter="{:.2f}"))
+
+        #### Add Ticker live prices
+        with st.spinner("Pesquisando valores atuais..."):
+            try:
+                for tkt, row in df_synthesis.iterrows():
+                    tker = yf.Ticker(tkt+".SA")
+                    precoAtual = tker.fast_info.last_price
+                    df_synthesis.loc[tkt, "Preco Atual"] = precoAtual
+                    
+                    
+                #df_synthesis.style.applymap(self._color_cell)#("background-color: darkorange")
+                st.dataframe(df_synthesis.style.format(subset=['Valor Investido', 'Preco_medio', 'Preco Atual'], formatter="{:.2f}")\
+                                                .apply(self._color_cell, subset=['Preco_medio', 'Preco Atual'], axis=None))
+            except:
+                st.warning("Não foi possível receber os valores atuais do yFinance. Atualize a página!")
+                st.dataframe(df_synthesis.style.format(subset=['Valor Investido', 'Preco_medio'], formatter="{:.2f}"))
+
 
 #################################
 ####    Plotting             ####
 #################################
-     
     def plotting(self):
         #### groupping multiple rows from the same ticker and creating a new dataframe to be plotted
         operValue_sub_df_movimentacao = self.filtered_df_movimentacao.groupby(["Produto"])["Valor da Operação"].sum().reset_index()
@@ -240,7 +274,7 @@ class CarteiraB3:
         #------------------------------------
         ## Rendimento total mensal
         #------------------------------------
-        st.header("Rendimento total")
+        st.header("Rendimento total (R$)")
 
         #with colTotalMovimentacao:
         st.bar_chart(df_totalYear_gruped)
@@ -293,7 +327,7 @@ class CarteiraB3:
 
         aux1 = self.df_posicao.groupby("Produto")["Quantidade"].sum().reset_index()
         hPos_quantidadeCotas = alt.Chart(aux1, title="FIIs - Ranking por Quantidade de Cotas").mark_bar(opacity=0.6).encode(
-            x=alt.X("Quantidade", type="quantitative", title="R$"),
+            x=alt.X("Quantidade", type="quantitative", title="Número de cotas"),
             y=alt.Y("Produto", type="nominal", title="Tickers", sort='-x'),
         )
         aux2 = self.df_posicao.groupby("Produto")["Valor Atualizado"].sum().reset_index()
@@ -320,7 +354,7 @@ class CarteiraB3:
 
         #df = px.data.tips()
         fig = px.sunburst(self.df_posicao, path=['ticker_type','Código de Negociação', 'Quantidade'], values='Quantidade', title="Quantidade de Cotas")
-        fig2 = px.sunburst(self.df_posicao, path=['ticker_type','Código de Negociação', 'Valor Atualizado'], values='Valor Atualizado', title="Valor de mercado")
+        fig2 = px.sunburst(self.df_posicao, path=['ticker_type','Código de Negociação', 'Valor Atualizado'], values='Valor Atualizado', title="Valor de mercado (R$)")
 
         with container3:
             with col5:
@@ -333,7 +367,9 @@ class CarteiraB3:
 if __name__ == "__main__":
     st.set_page_config(layout="wide")
 
-    st.title('CarteiraR')
+    st.markdown("<h1 style='text-align: center; color: tomato;'>CarteiraR</h1>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: tomato;'>(V 0.1)</h3>", unsafe_allow_html=True)
+   
 
     ####### Login
 
@@ -362,5 +398,3 @@ if __name__ == "__main__":
     elif st.session_state["authentication_status"] is None:
         st.warning('Please enter your username and password')
     
-
-
